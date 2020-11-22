@@ -1,0 +1,72 @@
+ 1 #coding=utf-8
+ 2 import datetime
+ 3 class solution(object):
+ 4     def __init__(self,board):
+ 5         self.b = board
+ 6         self.t = 0
+ 7 
+ 8     def check(self,x,y,value):#检查每行每列及每宫是否有相同项
+ 9         for row_item in self.b[x]:
+10             if row_item == value:
+11                 return False
+12         for row_all in self.b:
+13             if row_all[y] == value:
+14                 return False
+15         row,col=x/3*3,y/3*3
+16         row3col3=self.b[row][col:col+3]+self.b[row+1][col:col+3]+self.b[row+2][col:col+3]
+17         for row3col3_item in row3col3:
+18             if row3col3_item == value:
+19                 return False
+20         return True
+21 
+22     def get_next(self,x,y):#得到下一个未填项
+23         for next_soulu in range(y+1,9):
+24             if self.b[x][next_soulu] == 0:
+25                 return x,next_soulu
+26         for row_n in range(x+1,9):
+27             for col_n in range(0,9):
+28                 if self.b[row_n][col_n] == 0:
+29                     return row_n,col_n
+30         return -1,-1  #若无下一个未填项，返回-1
+31 
+32     def try_it(self,x,y):#主循环
+33         if self.b[x][y] == 0:
+34             for i in range(1,10):#从1到9尝试
+35                 self.t+=1
+36                 if self.check(x,y,i):#符合 行列宫均无条件 的
+37                     self.b[x][y]=i #将符合条件的填入0格
+38                     next_x,next_y=self.get_next(x,y)#得到下一个0格
+39                     if next_x == -1: #如果无下一个0格
+40                         return True  #返回True
+41                     else:        #如果有下一个0格，递归判断下一个0格直到填满数独
+42                         end=self.try_it(next_x,next_y)
+43                         if not end:   #在递归过程中存在不符合条件的，即 使try_it函数返回None的项
+44                             self.b[x][y] = 0    #回朔到上一层继续
+45                         else:
+46                             return True
+47 
+48     def start(self):
+49         begin = datetime.datetime.now()
+50         if self.b[0][0] == 0:
+51             self.try_it(0,0)
+52         else:
+53             x,y=self.get_next(0,0)
+54             self.try_it(x,y)
+55         for i in self.b:
+56             print i
+57         end = datetime.datetime.now()
+58         print '\ncost time:', end - begin
+59         print 'times:',self.t
+60         return
+61 
+62 
+63 s=solution([[8,0,0,0,0,0,0,0,0],
+64         [0,0,3,6,0,0,0,0,0],
+65         [0,7,0,0,9,0,2,0,0],
+66         [0,5,0,0,0,7,0,0,0],
+67         [0,0,0,8,4,5,7,0,0],
+68         [0,0,0,1,0,0,0,3,0],
+69         [0,0,1,0,0,0,0,6,8],
+70         [0,0,8,5,0,0,0,1,0],
+71         [0,9,0,0,0,0,4,0,0]])
+72 73 s.start()
