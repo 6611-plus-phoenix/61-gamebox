@@ -9,43 +9,31 @@ from pygame.locals import *
 FPS = 30
 SCREENWIDTH  = 288
 SCREENHEIGHT = 512
-PIPEGAPSIZE  = 100 # gap between upper and lower part of pipe
+PIPEGAPSIZE  = 115 # gap between upper and lower part of pipe
 BASEY        = SCREENHEIGHT * 0.79
 # image, sound and hitmask  dicts
 IMAGES, SOUNDS, HITMASKS = {}, {}, {}
 
 # list of all possible players (tuple of 3 positions of flap)
 PLAYERS_LIST = (
-    # red bird
+    # Hollow Knight
     (
-        'assets/sprites/redbird-upflap.png',
-        'assets/sprites/redbird-midflap.png',
-        'assets/sprites/redbird-downflap.png',
-    ),
-    # blue bird
-    (
-        'assets/sprites/bluebird-upflap.png',
-        'assets/sprites/bluebird-midflap.png',
-        'assets/sprites/bluebird-downflap.png',
-    ),
-    # yellow bird
-    (
-        'assets/sprites/yellowbird-upflap.png',
-        'assets/sprites/yellowbird-midflap.png',
-        'assets/sprites/yellowbird-downflap.png',
+        'assets/sprites/a1.png',
+        'assets/sprites/e1.png',
+        'assets/sprites/c1.png',
+        'assets/sprites/d1.png',
+        'assets/sprites/e1.png',
     ),
 )
 
 # list of backgrounds
 BACKGROUNDS_LIST = (
-    'assets/sprites/background-day.png',
-    'assets/sprites/background-night.png',
+    'assets/sprites/bg.png',
 )
 
 # list of pipes
 PIPES_LIST = (
-    'assets/sprites/pipe-green.png',
-    'assets/sprites/pipe-red.png',
+    'assets/sprites/pipe.png',
 )
 
 
@@ -81,7 +69,7 @@ def main():
     # message sprite for welcome screen
     IMAGES['message'] = pygame.image.load('assets/sprites/message.png').convert_alpha()
     # base (ground) sprite
-    IMAGES['base'] = pygame.image.load('assets/sprites/base.png').convert_alpha()
+    IMAGES['base'] = pygame.image.load('assets/sprites/base1.png').convert_alpha()
 
     # sounds
     if 'win' in sys.platform:
@@ -106,6 +94,9 @@ def main():
             pygame.image.load(PLAYERS_LIST[randPlayer][0]).convert_alpha(),
             pygame.image.load(PLAYERS_LIST[randPlayer][1]).convert_alpha(),
             pygame.image.load(PLAYERS_LIST[randPlayer][2]).convert_alpha(),
+            pygame.image.load(PLAYERS_LIST[randPlayer][3]).convert_alpha(),
+            pygame.image.load(PLAYERS_LIST[randPlayer][4]).convert_alpha(),
+            #pygame.image.load(PLAYERS_LIST[randPlayer][5]).convert_alpha(),
         )
 
         # select random pipe sprites
@@ -127,6 +118,8 @@ def main():
             getHitmask(IMAGES['player'][0]),
             getHitmask(IMAGES['player'][1]),
             getHitmask(IMAGES['player'][2]),
+            getHitmask(IMAGES['player'][3]),
+            getHitmask(IMAGES['player'][4]),
         )
 
         movementInfo = showWelcomeAnimation()
@@ -138,7 +131,7 @@ def showWelcomeAnimation():
     """Shows welcome screen animation of flappy bird"""
     # index of player to blit on screen
     playerIndex = 0
-    playerIndexGen = cycle([0, 1, 2, 1])
+    playerIndexGen = cycle([0, 1, 2, 3, 4])
     # iterator used to change playerIndex after every 5th iteration
     loopIter = 0
 
@@ -377,11 +370,30 @@ def showGameOverScreen(crashInfo):
 
         playerSurface = pygame.transform.rotate(IMAGES['player'][1], playerRot)
         SCREEN.blit(playerSurface, (playerx,playery))
-        SCREEN.blit(IMAGES['gameover'], (50, 180))
+        #SCREEN.blit(IMAGES['gameover'], (50, 180))
 
         FPSCLOCK.tick(FPS)
         pygame.display.update()
+        if score >= 1 and score < 40:
 
+            list_hard[2] = 1
+            strnull = []
+            # print('游戏通关！获得隐藏奖励“帝王之翼”')
+            allgameSurface.next_screen(strnull, 3)
+            # 进入下一个游戏，关掉本游戏
+        elif score >= 40:
+            list_hard[2] = 2
+            strnull = []
+            allgameSurface.next_screen(strnull,3)
+            # print('#获取额外剧情？（看情况可能没有额外剧情）')
+            # 如果来得及的话，可能会做额外剧情，过完额外剧情再进入下一个游戏
+        else:
+            # print('游戏失败，请回到初始界面！')
+            # 关掉本游戏，回到初始界面
+            allgameSurface.lose_screen(2)
+
+import allgameSurface
+from allgameSurface import list_hard
 
 def playerShm(playerShm):
     """oscillates the value of playerShm['val'] between 8 and -8"""
